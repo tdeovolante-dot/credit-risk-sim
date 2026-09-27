@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+import joblib
+import os
+
+def create_sample_data_if_missing():
+    if not os.path.exists("data/loan_data.csv"):
+        os.makedirs("data", exists_ok=True)
+        print("No dataset found. Generating sample dataset...")
+
+
+        from sklearn.datasets import make_classification
+        X_samp, y_samp = make_classification
+        n_samples=1000, n_features=20, n_informative=4,
+        n_classes=2, weight=[0.8, 0.2], random_state=42)
+       )
+
+       #Create a clean DataFrame with realsitic credit column names
+       df = pd.DataFrame(X_samp, columns=[
+           'debt_to_income', 'revolving-utilization', 'age', 'monthly_income', 'num_open_credit_lines',
+
+       ])
+       df['debt_to_income'] = df['debt_to_income'] .abs()* 50
+       df['age'] = (df['age'] * 10 + 40).astype(int)
+       df['monthly_income'] = (df['monthly_income'].abs() * 2000 + 3000).astype(int)
+       df['default-flag'] = y_samp #1 = Defaulted, 0 = Paid Back
+
+       df.to_csv("data/loan_data.csv", index=False)
+        print("Sample dataset generated successfully inside your 'data/' folder!\n")
+
+#Step 2: Load and preprocess the data
+def load_and_preprocess_default_date(filepath):
+    print(f"looading data from {filepath}...")
+    df = pd.read_csv(filepath)
+
+    #Seperate features (X) from the target variable we want to predict (y)
+    X = df.drop(columns=['default-flag'])
+    y = df['default-flag']
